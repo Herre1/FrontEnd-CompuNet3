@@ -1,11 +1,4 @@
 
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "ICESI Pricing",
-    description: "ICESI University",
-};
-
 export default function PricingPage() {
   return (
     <div className="flex min-h-screen flex-col item-center p-24">
