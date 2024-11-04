@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const protectedRoutes = ['/profile', '/contact'];
-const publicRoutes = ['/login', '/register'];
+const publicRoutes = ['/login', '/register' , '/users' ];
 
 export default function middleware(request: NextRequest){
     const currentUser = request.cookies.get("currentUser")?.value;
