@@ -1,23 +1,26 @@
 // services/authService.ts
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
-const API_URL = 'https://proyecto-compunet-lll.onrender.com';
+export class AuthService {
+    protected readonly axios: AxiosInstance; 
 
-export interface RegisterData {
-    username: string;
-    email: string;
-    password: string;
+    public constructor(url: string) {
+        this.axios = axios.create({
+            baseURL: url, 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            timeout: 3000
+        });
+    }
+
+    public async login(email: string, password: string): Promise<unknown> { // Cambiado a unknown
+        const response = await this.axios.post('/Auth/login', { email, password });
+        return response.data;
+    }
+
+    public async register(fullName: string, email: string, password: string): Promise<void> {
+        await this.axios.post("/Auth/register", { fullName, email, password });
+    }
+    
 }
-
-export interface LoginData {
-    email: string;
-    password: string;
-}
-
-export const registerUser = async (data: RegisterData) => {
-    return await axios.post(`${API_URL}/register`, data);
-};
-
-export const loginUser = async (data: LoginData) => {
-    return await axios.post(`${API_URL}/login`, data);
-};
