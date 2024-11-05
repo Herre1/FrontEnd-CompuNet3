@@ -38,6 +38,8 @@ const Login = () => {
 
       // Guardar el token y el userId en localStorage
       localStorage.setItem('token', result.token);
+      // Después de `localStorage.setItem('token', result.token);`
+      console.log("Token guardado:", localStorage.getItem('token'));
       localStorage.setItem('userId', result.id); // Guardar el ID del usuario
 
       // Redirigir al usuario a la página de inicio

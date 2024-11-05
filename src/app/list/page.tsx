@@ -38,14 +38,16 @@ const UserLists: React.FC = () => {
         return;
       }
 
-      try {
-        const response = await axios.get(`https://proyecto-compunet-lll.onrender.com/api/v1/lists/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setLists(response.data);
-      } catch (error) {
-        setError('Failed to load lists');
-      }
+  try {
+    const response = await axios.get(`https://proyecto-compunet-lll.onrender.com/api/v1/lists/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log("Data de listas recibida:", response.data); // Revisa si `contents` contiene los datos
+    setLists(response.data);
+  } catch (error) {
+    setError('Failed to load lists');
+  }
+
     };
 
     fetchUserLists();
@@ -62,7 +64,7 @@ const UserLists: React.FC = () => {
         <div key={list.id}>
           <h2>Status: {list.status}</h2>
           <ul>
-            {list.contents.map((content) => (
+            {(list.contents || []).map((content) => (
               <li key={content.id}>
                 <h3>{content.title}</h3>
                 <p>{content.description}</p>
@@ -72,7 +74,7 @@ const UserLists: React.FC = () => {
         </div>
       ))}
     </div>
-  );
+  );  
 };
 
 export default UserLists;

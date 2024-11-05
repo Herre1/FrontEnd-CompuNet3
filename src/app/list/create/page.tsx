@@ -37,11 +37,12 @@ const CreateList: React.FC = () => {
 
     // Leer userId desde localStorage en el cliente
     const storedUserId = localStorage.getItem('userId');
+    // Después de `localStorage.setItem('token', result.token);`
+    console.log("Token guardado:", localStorage.getItem('token'));
     if (storedUserId) {
       setUserId(storedUserId);
     }
   }, []);
-
   // Función para manejar el envío del formulario
   const onSubmit = async (data: CreateListForm) => {
     if (!userId) {
@@ -49,20 +50,34 @@ const CreateList: React.FC = () => {
       return;
     }
 
+    // Obtener el token de localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Authorization token not found');
+      return;
+    }
+
     try {
-      const response = await axios.post('https://proyecto-compunet-lll.onrender.com/api/v1/lists', {
-        userId,
-        contentIds: data.contentIds,
-        status: data.status,
-      });
+      const response = await axios.post(
+        'https://proyecto-compunet-lll.onrender.com/api/v1/lists',
+        {
+          userId,
+          contentIds: data.contentIds,
+          status: data.status,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }, // Incluir el token en la solicitud
+        }
+      );
 
       if (response.status === 201) {
-        router.push('/lists');
+        router.push('/list');
       }
     } catch (err) {
       setError('Failed to create list');
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
