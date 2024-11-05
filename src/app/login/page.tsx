@@ -15,7 +15,7 @@ const Login = () => {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<LoginData>();
-  
+
   const [error, setError] = useState<string>('');
   const router = useRouter();
 
@@ -36,7 +36,11 @@ const Login = () => {
         throw new Error(result.message || 'Login failed');
       }
 
+      // Guardar el token y el userId en localStorage
       localStorage.setItem('token', result.token);
+      localStorage.setItem('userId', result.id); // Guardar el ID del usuario
+
+      // Redirigir al usuario a la página de inicio
       router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
