@@ -1,3 +1,4 @@
+// Navbar.tsx
 "use client";
 
 import Link from "next/link";
@@ -26,10 +27,11 @@ const Navbar = () => {
   return (
     <div className="flex flex-col h-full p-4 bg-gray-800 text-white">
       <div className="flex flex-col items-center mb-6">
-        <img src="/logo.svg" alt="Logo" className="w-16 h-16 mb-4" />
+        {/* Aumenta el tamaño del logo en el navbar */}
+        <img src="/logo.svg" alt="Logo" className="w-24 h-24 mb-4" />
         <span className="text-lg font-semibold">Bienvenido, {username}</span>
       </div>
-
+      
       <div className="flex-1 space-y-4 w-full">
         <Link href="/list" className="flex items-center gap-2 p-2 hover:bg-gray-700 rounded-md">
           <AiOutlineHome size={24} />
