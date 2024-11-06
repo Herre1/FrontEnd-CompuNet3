@@ -41,9 +41,10 @@ const Login = () => {
       // Después de `localStorage.setItem('token', result.token);`
       console.log("Token guardado:", localStorage.getItem('token'));
       localStorage.setItem('userId', result.id); // Guardar el ID del usuario
+      localStorage.setItem('username', result.fullName); // Guardar el nombre del usuario
 
       // Redirigir al usuario a la página de inicio
-      router.push('/');
+      router.push('/home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     }
