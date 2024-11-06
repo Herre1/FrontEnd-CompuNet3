@@ -26,6 +26,7 @@ const UserLists: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { token } = useAuth();
+  
 
   useEffect(() => {
     const fetchUserLists = async () => {
@@ -48,6 +49,11 @@ const UserLists: React.FC = () => {
           }
         );
         console.log("Data de listas recibida:", response.data);
+        response.data.forEach((list: List) => {
+          console.log(`Lista ID: ${list.id}, Contents:`, list.contents);
+        });
+        console.log("Respuesta completa de la API:", response.data);
+
         setLists(response.data || []);  // Asegurándote de que lists sea un array vacío si no se recibe nada
         setFilteredLists(response.data || []);  // Lo mismo para filteredLists
       } catch (error) {
@@ -57,32 +63,33 @@ const UserLists: React.FC = () => {
 
     fetchUserLists();
   }, [token, router]);
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
+    
+  
     const filtered = lists.filter((list) =>
       list.status.toLowerCase().includes(term) ||
+      list.id.toString().toLowerCase().includes(term) ||  // convert id to string if necessary
+      
       list.contents.some(
         (content) =>
           content.title.toLowerCase().includes(term) ||
           content.description.toLowerCase().includes(term)
       )
+      
     );
+  
     setFilteredLists(filtered);
   };
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
+  
   return (
     <div className="flex min-h-screen">
       {/* Sidebar con Navbar */}
       <div className="w-1/5 bg-gray-900">
         <Navbar />
       </div>
-
+  
       {/* Contenido Principal */}
       <div className="flex-1 p-6 bg-gray-100">
         <div className="flex items-center mb-6">
@@ -98,19 +105,28 @@ const UserLists: React.FC = () => {
             />
           </div>
         </div>
-
+  
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Tus Listas</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredLists.length > 0 ? (
             filteredLists.map((list) => (
-              <div key={list.id} className="bg-white p-4 rounded-lg shadow-md">
+              <div
+                key={list.id}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
+              >
                 <h2 className="text-xl font-semibold mb-2 text-gray-800">
                   Estado: {list.status}
                 </h2>
-                <ul>
+                <p className="text-gray-600 mb-2">ID: {list.id}</p>
+  
+                {/* Contenido de la lista */}
+                <ul className="space-y-4">
                   {list.contents && list.contents.length > 0 ? (
                     list.contents.map((content) => (
-                      <li key={content.id} className="mb-4">
+                      <li
+                        key={content.id}
+                        className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                      >
                         <h3 className="text-lg font-medium text-gray-700">
                           {content.title}
                         </h3>
@@ -130,6 +146,6 @@ const UserLists: React.FC = () => {
       </div>
     </div>
   );
-};
+} 
 
 export default UserLists;
