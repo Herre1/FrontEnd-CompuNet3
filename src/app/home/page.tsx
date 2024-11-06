@@ -40,7 +40,7 @@ const HomePage = () => {
       {/* Main Content */}
       <div className="flex-1 p-6 bg-gray-100">
         <div className="flex items-center mb-6">
-          <img src="/logo.svg" alt="Logo" className="w-10 h-10 mr-4" />
+          <img src="/logo.png" alt="Logo" className="w-10 h-10 mr-4" />
           <div className="relative flex items-center w-full max-w-lg">
             <AiOutlineSearch className="absolute left-3 text-gray-500" />
             <input
