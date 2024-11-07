@@ -28,25 +28,25 @@ const HomePage = () => {
     fetchContents();
   }, []);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (event) => {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
     filterContent(term, selectedType, selectedGenre, selectedRating);
   };
 
-  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTypeChange = (event) => {
     const type = event.target.value;
     setSelectedType(type);
     filterContent(searchTerm, type, selectedGenre, selectedRating);
   };
 
-  const handleGenreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleGenreChange = (event) => {
     const genre = event.target.value;
     setSelectedGenre(genre);
     filterContent(searchTerm, selectedType, genre, selectedRating);
   };
 
-  const handleRatingChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleRatingChange = (event) => {
     const rating = event.target.value;
     setSelectedRating(rating);
     filterContent(searchTerm, selectedType, selectedGenre, rating);
@@ -57,26 +57,28 @@ const HomePage = () => {
   };
 
 
-  const filterContent = (term: string, type: string, genre: string, rating: string) => {
-    const filtered = contents.filter((content) => {
+  
+      const filterContent = (term, type, genre, rating) => {
+      const filtered = contents.filter((content) => {
       const matchesTitle = content.title.toLowerCase().includes(term);
       const matchesType = type === "" || content.type === type;
       const matchesGenre = genre === "" || content.genre.includes(genre);
       const matchesRating = rating === "" || content.rating === parseInt(rating, 10);
-
-      // Búsqueda adicional por actores, director (como cadena), estudio o compañía de producción
-      const matchesActors = content.actors && content.actors.some((actor: string) => actor.toLowerCase().includes(term));
-      const matchesDirector = content.director && content.director.toLowerCase().includes(term); // Tratar `director` como una cadena
+      const matchesActors = content.actors && content.actors.some((actor) => actor.toLowerCase().includes(term));
+      const matchesDirector = content.director && content.director.toLowerCase().includes(term);
       const matchesStudio = content.studio && content.studio.toLowerCase().includes(term);
       const matchesProductionCompany = content.productionCompany && content.productionCompany.toLowerCase().includes(term);
 
       return (
-        matchesTitle ||
-        matchesActors ||
-        matchesDirector || // Ahora busca correctamente en `director` como una cadena de texto
-        matchesStudio ||
-        matchesProductionCompany
-      ) && matchesType && matchesGenre && matchesRating;
+        (matchesTitle ||
+          matchesActors ||
+          matchesDirector ||
+          matchesStudio ||
+          matchesProductionCompany) &&
+        matchesType &&
+        matchesGenre &&
+        matchesRating
+      );
     });
     setFilteredContents(filtered);
   };
@@ -107,7 +109,6 @@ const HomePage = () => {
         
         {/* Advanced Search Filters */}
         <div className="flex space-x-4 mb-4">
-          {/* Dropdown for Type */}
           <select
             value={selectedType}
             onChange={handleTypeChange}
@@ -121,7 +122,6 @@ const HomePage = () => {
             ))}
           </select>
 
-          {/* Dropdown for Genre */}
           <select
             value={selectedGenre}
             onChange={handleGenreChange}
@@ -164,6 +164,7 @@ const HomePage = () => {
               id={content.id}
               title={content.title}
               type={content.type}
+              imageUrl={content.imageUrl} // Asegúrate de pasar la URL de la imagen
             />
           ))}
         </div>
