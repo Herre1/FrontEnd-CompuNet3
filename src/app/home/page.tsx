@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useEffect, useState } from "react";
 import ContentCard from "@/components/content/ContentCard";
 import Navbar from "@/components/nav-bar/NavBar";
@@ -13,12 +14,17 @@ const HomePage = () => {
   const [selectedType, setSelectedType] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedRating, setSelectedRating] = useState("");
+  const [isAuthorizedUser, setIsAuthorizedUser] = useState(false);
   const router = useRouter();
+  
   const genres = ["Action", "Comedy", "Horror", "Romance", "Drama", "Science fiction", "Adventure", "Fantasy", "Thriller", "Crime"];
   const contentTypes = ["movie", "series", "anime"];
   const ratings = Array.from({ length: 10 }, (_, i) => i + 1);
 
   useEffect(() => {
+    const userRole = localStorage.getItem("roles");
+    setIsAuthorizedUser(userRole === "admin");
+
     const fetchContents = async () => {
       const response = await fetch("https://proyecto-compunet-lll.onrender.com/api/v1/content");
       const data = await response.json();
@@ -28,37 +34,35 @@ const HomePage = () => {
     fetchContents();
   }, []);
 
-  const handleSearch = (event: { target: { value: string; }; }) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
     filterContent(term, selectedType, selectedGenre, selectedRating);
   };
 
-  const handleTypeChange = (event: { target: { value: any; }; }) => {
+  const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const type = event.target.value;
     setSelectedType(type);
     filterContent(searchTerm, type, selectedGenre, selectedRating);
   };
 
-  const handleGenreChange = (event: { target: { value: any; }; }) => {
+  const handleGenreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const genre = event.target.value;
     setSelectedGenre(genre);
     filterContent(searchTerm, selectedType, genre, selectedRating);
   };
 
-  const handleRatingChange = (event: { target: { value: any; }; }) => {
+  const handleRatingChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const rating = event.target.value;
     setSelectedRating(rating);
     filterContent(searchTerm, selectedType, selectedGenre, rating);
   };
 
   const handleAddContent = () => {
-    router.push('/home/add-content');
+    if (isAuthorizedUser) router.push("/home/add-content");
   };
 
-      
-  
-  const filterContent = (term, type, genre, rating) => {
+  const filterContent = (term: string, type: string, genre: string, rating: string) => {
     const filtered = contents.filter((content) => {
       const matchesTitle = content.title.toLowerCase().includes(term);
       const matchesType = type === "" || content.type === type;
@@ -68,7 +72,7 @@ const HomePage = () => {
       const matchesDirector = content.director && content.director.toLowerCase().includes(term);
       const matchesStudio = content.studio && content.studio.toLowerCase().includes(term);
       const matchesProductionCompany = content.productionCompany && content.productionCompany.toLowerCase().includes(term);
-  
+
       return (
         (matchesTitle || matchesActors || matchesDirector || matchesStudio || matchesProductionCompany) &&
         matchesType &&
@@ -76,10 +80,9 @@ const HomePage = () => {
         matchesRating
       );
     });
-  
+
     setFilteredContents(Array.isArray(filtered) ? filtered : []);
   };
-  
 
   return (
     <div className="flex min-h-screen">
@@ -104,7 +107,7 @@ const HomePage = () => {
             />
           </div>
         </div>
-        
+
         {/* Advanced Search Filters */}
         <div className="flex space-x-4 mb-4">
           <select
@@ -132,8 +135,7 @@ const HomePage = () => {
               </option>
             ))}
           </select>
-          
-          {/* Dropdown for Rating */}
+
           <select
             value={selectedRating}
             onChange={handleRatingChange}
@@ -147,13 +149,17 @@ const HomePage = () => {
             ))}
           </select>
         </div>
-          {/* Add Content Button */}
+
+        {/* Add Content Button - Visible only for authorized user */}
+        {isAuthorizedUser && (
           <button
             onClick={handleAddContent}
             className="ml-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors duration-300"
           >
             Añadir Contenido
           </button>
+        )}
+
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Todos los Contenidos</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredContents.map((content) => (
@@ -162,7 +168,7 @@ const HomePage = () => {
               id={content.id}
               title={content.title}
               type={content.type}
-              imageUrl={content.imageUrl} // Asegúrate de pasar la URL de la imagen
+              imageUrl={content.imageUrl}
             />
           ))}
         </div>
