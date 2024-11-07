@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { AiOutlineSearch } from "react-icons/ai"; // Icono de búsqueda
-import { AiOutlineDelete } from "react-icons/ai"; // Icono de eliminar
-import Navbar from "@/components/nav-bar/NavBar"; // Importa el Navbar
+import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineDelete } from "react-icons/ai";
+import Navbar from "@/components/nav-bar/NavBar";
 
 interface Content {
   id: string;
@@ -47,8 +47,8 @@ const UserLists: React.FC = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setLists(response.data || []); // Asegúrate de que lists sea un array vacío si no se recibe nada
-        setFilteredLists(response.data || []); // Lo mismo para filteredLists
+        setLists(response.data || []);
+        setFilteredLists(response.data || []);
       } catch (error) {
         setError("Failed to load lists");
       }
@@ -63,7 +63,7 @@ const UserLists: React.FC = () => {
 
     const filtered = lists.filter((list) =>
       list.status.toLowerCase().includes(term) ||
-      list.id.toString().toLowerCase().includes(term) || // Convert id to string if necessary
+      list.id.toString().toLowerCase().includes(term) ||
       list.contents.some(
         (content) =>
           content.title.toLowerCase().includes(term) ||
@@ -74,9 +74,7 @@ const UserLists: React.FC = () => {
     setFilteredLists(filtered);
   };
 
-  // Función para manejar la eliminación de una lista
   const handleDelete = async (listId: string) => {
-    const token = localStorage.getItem("token");
     if (!token) {
       setError("Authorization token not found");
       return;
@@ -91,7 +89,6 @@ const UserLists: React.FC = () => {
       );
 
       if (response.status === 200) {
-        // Elimina la lista del estado local después de una eliminación exitosa
         setLists(lists.filter((list) => list.id !== listId));
         setFilteredLists(filteredLists.filter((list) => list.id !== listId));
       }
@@ -102,15 +99,22 @@ const UserLists: React.FC = () => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar con Navbar */}
       <div className="w-1/5 bg-gray-900">
         <Navbar />
       </div>
 
-      {/* Contenido Principal */}
       <div className="flex-1 p-6 bg-gray-100">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Tus Listas</h1>
+          <button
+            onClick={() => router.push("/list/create")}
+            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Crear Lista
+          </button>
+        </div>
+
         <div className="flex items-center mb-6">
-          <img src="/logo.png" alt="Logo" className="w-10 h-10 mr-4" />
           <div className="relative flex items-center w-full max-w-lg">
             <AiOutlineSearch className="absolute left-3 text-gray-500" />
             <input
@@ -123,7 +127,6 @@ const UserLists: React.FC = () => {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">Tus Listas</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredLists.length > 0 ? (
             filteredLists.map((list) => (
@@ -131,7 +134,6 @@ const UserLists: React.FC = () => {
                 key={list.id}
                 className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow relative"
               >
-                {/* Botón de eliminar (solo ícono) */}
                 <button
                   onClick={() => handleDelete(list.id)}
                   className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
@@ -144,7 +146,6 @@ const UserLists: React.FC = () => {
                 </h2>
                 <p className="text-gray-600 mb-2">ID: {list.id}</p>
 
-                {/* Contenido de la lista */}
                 <ul className="space-y-4">
                   {list.contents && list.contents.length > 0 ? (
                     list.contents.map((content) => (

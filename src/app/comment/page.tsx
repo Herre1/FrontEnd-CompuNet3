@@ -34,7 +34,7 @@ const CommentsPage: React.FC = () => {
         return;
       }
 
-      const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("userId"); // Asegúrate de que el userId esté almacenado en el almacenamiento local
       if (!userId) {
         setError("User ID not found");
         return;
@@ -42,7 +42,7 @@ const CommentsPage: React.FC = () => {
 
       try {
         const response = await axios.get(
-          `https://proyecto-compunet-lll.onrender.com/api/v1/comments`,
+          `https://proyecto-compunet-lll.onrender.com/api/v1/comments/user/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -65,9 +65,7 @@ const CommentsPage: React.FC = () => {
         {
           headers: { Authorization: `Bearer ${token}` },
         }
-        
       );
-        console.log("Respuesta completa:", JSON.stringify(response.data, null, 2));
 
       if (response.status === 200) {
         setComments((prevComments) =>

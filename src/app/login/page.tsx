@@ -43,6 +43,7 @@ const Login = () => {
       localStorage.setItem('userId', result.id); // Guardar el ID del usuario
       localStorage.setItem('username', result.fullName); // Guardar el nombre del usuario
 
+
       // Redirigir al usuario a la página de inicio
       router.push('/home');
     } catch (err) {

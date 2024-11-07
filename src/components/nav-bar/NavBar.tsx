@@ -13,7 +13,7 @@ const Navbar = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const savedUsername = localStorage.getItem("fullName") || "Usuario";
+    const savedUsername = localStorage.getItem("username") || "Usuario";
     setUsername(savedUsername);
   }, []);
 
