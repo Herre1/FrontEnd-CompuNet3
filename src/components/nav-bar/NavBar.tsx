@@ -13,7 +13,7 @@ const Navbar = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const savedUsername = localStorage.getItem("username") || "Usuario";
+    const savedUsername = localStorage.getItem("fullName") || "Usuario";
     setUsername(savedUsername);
   }, []);
 
@@ -52,19 +52,14 @@ const Navbar = () => {
           <RiEmotionLine size={24} /> {/* Aquí puedes usar otro icono de react-icons */}
           Mis Reacciones
         </Link>
-        
-        <Link href="/content" className="flex items-center gap-2 p-2 hover:bg-gray-700 rounded-md">
-        <AiOutlineAppstore size={24} />
-          Catálogo
+        <Link href="/profile" className="flex items-center gap-2 p-2 hover:bg-gray-700 rounded-md">
+            <FiUser size={24} />
+            Mi Perfil
         </Link>
       </div>
 
 
       <div className="flex flex-col items-center mt-auto space-y-2">
-        <Link href="/profile" className="w-full text-center flex items-center gap-2 justify-center p-2 bg-blue-500 rounded-md hover:bg-blue-600">
-          <FiUser size={24} />
-          Perfil
-        </Link>
         <button onClick={handleLogout} className="w-full flex items-center gap-2 justify-center p-2 bg-red-500 rounded-md hover:bg-red-600">
           <FiLogOut size={24} />
           Cerrar Sesión
