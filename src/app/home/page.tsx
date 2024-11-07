@@ -114,6 +114,10 @@ const HomePage = () => {
             <option value="Comedy">Comedia</option>
             <option value="Thriller">Thriller</option>
             <option value="Drama">Drama</option>
+            <option value="Adventure">Aventura</option>
+            <option value="Fantasy">Fantasia</option>
+            <option value="Crime">Crimen</option>
+            <option value="Science fiction">Ciencia ficcion</option>
           </select>
 
           <select
