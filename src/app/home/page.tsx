@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ContentCard from "@/components/content/ContentCard";
 import Navbar from "@/components/nav-bar/NavBar";
+import { useRouter } from "next/navigation";
 import { AiOutlineSearch } from "react-icons/ai";
 
 const HomePage = () => {
@@ -12,7 +13,7 @@ const HomePage = () => {
   const [selectedType, setSelectedType] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedRating, setSelectedRating] = useState("");
-
+  const router = useRouter();
   const genres = ["Action", "Comedy", "Horror", "Romance", "Drama", "Science fiction", "Adventure", "Fantasy", "Thriller", "Crime"];
   const contentTypes = ["movie", "series", "anime"];
   const ratings = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -50,6 +51,11 @@ const HomePage = () => {
     setSelectedRating(rating);
     filterContent(searchTerm, selectedType, selectedGenre, rating);
   };
+
+  const handleAddContent = () => {
+    router.push('/home/add-content');
+  };
+
 
   const filterContent = (term: string, type: string, genre: string, rating: string) => {
     const filtered = contents.filter((content) => {
@@ -98,7 +104,7 @@ const HomePage = () => {
             />
           </div>
         </div>
-
+        
         {/* Advanced Search Filters */}
         <div className="flex space-x-4 mb-4">
           {/* Dropdown for Type */}
@@ -128,7 +134,7 @@ const HomePage = () => {
               </option>
             ))}
           </select>
-
+          
           {/* Dropdown for Rating */}
           <select
             value={selectedRating}
@@ -143,7 +149,13 @@ const HomePage = () => {
             ))}
           </select>
         </div>
-
+          {/* Add Content Button */}
+          <button
+            onClick={handleAddContent}
+            className="ml-4 px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors duration-300"
+          >
+            Añadir Contenido
+          </button>
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Todos los Contenidos</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredContents.map((content) => (

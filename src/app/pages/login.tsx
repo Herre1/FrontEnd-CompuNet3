@@ -14,7 +14,7 @@ const Login: React.FC = () => {
             const response = await loginUser(data);
             setMessage('Login successful');
             localStorage.setItem('token', response.data.token);
-            router.push('/'); // Redirige al home o a otra ruta
+            router.push('/'); 
         } catch (error) {
             setMessage('Login failed');
         }

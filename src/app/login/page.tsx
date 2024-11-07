@@ -74,7 +74,7 @@ const Login = () => {
                   message: 'Invalid email address',
                 },
               })}
-              className={`mt-1 block w-full rounded-md border ${
+              className={`mt-1 block w-full rounded-md border text-gray-800 ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               } shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
@@ -97,7 +97,7 @@ const Login = () => {
                   message: 'Password must be at least 6 characters',
                 },
               })}
-              className={`mt-1 block w-full rounded-md border ${
+              className={`mt-1 block w-full rounded-md border text-gray-800 ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               } shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
