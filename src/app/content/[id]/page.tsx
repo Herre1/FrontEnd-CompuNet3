@@ -71,19 +71,6 @@ const ContentDetails = () => {
                             <AiOutlineArrowLeft size={20} className="mr-2" />
                             Volver
                         </button>
-                        <div className="flex space-x-4">
-                            <AddToListButton contentId={content.id} icon={<AiOutlineStar size={20} />} />
-                            {isAuthorizedUser && (
-                                <>
-                                    <button onClick={handleModify} className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
-                                        <AiOutlineEdit size={20} />
-                                    </button>
-                                    <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
-                                        <AiOutlineDelete size={20} />
-                                    </button>
-                                </>
-                            )}
-                        </div>
                     </div>
 
                     {/* Imagen por defecto */}
