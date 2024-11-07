@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -23,21 +23,20 @@ const Login = () => {
   const getUser = async (user_id: any) => {
     try {
       const res = await axios.get(
-          `https://proyecto-compunet-lll.onrender.com/users/${user_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        
-        localStorage.setItem('roles', res.data.roles)
+        `https://proyecto-compunet-lll.onrender.com/users/${user_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      localStorage.setItem('roles', res.data.roles);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setError("Error al crear contenido");
     }
-  }
+  };
 
   const onSubmit = async (data: LoginData) => {
     try {
@@ -56,22 +55,21 @@ const Login = () => {
         throw new Error(result.message || 'Login failed');
       }
 
-      getUser(result.id)
-
-      // Guardar el token y el userId en localStorage
+      getUser(result.id);
       localStorage.setItem('token', result.token);
-      // Después de `localStorage.setItem('token', result.token);`
-      console.log("Token guardado:", localStorage.getItem('token'));
-      localStorage.setItem('userId', result.id); // Guardar el ID del usuario
-      localStorage.setItem('email', data.email)
-      localStorage.setItem('username', result.fullName); // Guardar el nombre del usuario
-      localStorage.setItem('roles', result.roles); // Guardar el nombre del usuario
+      localStorage.setItem('userId', result.id);
+      localStorage.setItem('email', data.email);
+      localStorage.setItem('username', result.fullName);
+      localStorage.setItem('roles', result.roles);
 
-      // Redirigir al usuario a la página de inicio
       router.push('/home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     }
+  };
+
+  const handleRegisterRedirect = () => {
+    router.push('/register'); // Ajusta la ruta según tu configuración
   };
 
   return (
@@ -146,6 +144,16 @@ const Login = () => {
             {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">Don't have an account?</p>
+          <button
+            onClick={handleRegisterRedirect}
+            className="mt-2 text-blue-600 hover:underline"
+          >
+            Register here
+          </button>
+        </div>
       </div>
     </div>
   );
