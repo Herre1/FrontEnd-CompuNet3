@@ -102,7 +102,6 @@ const HomePage = () => {
             <option value="movie">Película</option>
             <option value="series">Serie</option>
             <option value="anime">Anime</option>
-            <option value="Thriller">Thriller</option>
           </select>
 
           <select
@@ -114,6 +113,7 @@ const HomePage = () => {
             <option value="Action">Acción</option>
             <option value="Comedy">Comedia</option>
             <option value="Thriller">Thriller</option>
+            <option value="Drama">Drama</option>
           </select>
 
           <select

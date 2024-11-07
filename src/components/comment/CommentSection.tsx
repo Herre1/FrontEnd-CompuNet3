@@ -308,8 +308,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
                 </button>
               </div>
             )}
-            <button onClick={() => setActiveCommentId(comment.id)} className="mt-2 text-blue-600">
-              Responder
+            <button onClick={() => setActiveCommentId(comment.id)} className="mt- text-blue-600 px-4">
+               Responder
             </button>
           </div>
         ))}
