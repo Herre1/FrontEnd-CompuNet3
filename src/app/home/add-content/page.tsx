@@ -252,7 +252,11 @@ const AddContentPage: React.FC = () => {
               max="10"
             />
           </div>
-
+          {/* Image */}
+          <div className="mx-auto max-w-xs">
+        
+            <input id="example1" type="file" className="mt-2   text-sm file:mr-1 file:rounded-md file:border-0 file:bg-teal-700 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white file:bg-blue-500  " />
+            </div>
           <button
             type="submit"
             className="w-full bg-blue-500 rounded-md hover:bg-blue-600 text-white py-2 rounded-md"
