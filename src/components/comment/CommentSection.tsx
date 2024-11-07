@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { AiOutlineLike, AiOutlineDislike } from 'react-icons/ai';
-import ShowRepliesButton from '../replies/ShowRepliesButton';
 import { useAuth } from "../../app/store/AuthContext";
 import axios from 'axios';
 
@@ -15,7 +14,7 @@ interface Comment {
   userReaction?: 'like' | 'dislike' | null;
   likeCount: number;
   dislikeCount: number;
-  replies?: Comment[]; // Cambiado para indicar que puede estar indefinido inicialmente
+  replies?: Comment[];
   createdAt: string;
 }
 
@@ -31,40 +30,48 @@ const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
   const [showReplies, setShowReplies] = useState<{ [key: string]: boolean }>({});
   const { token } = useAuth();
 
-  // Cargar los comentarios principales del contenido
+  // Cargar los comentarios principales del contenido con conteo de reacciones
   useEffect(() => {
-    fetch(`https://proyecto-compunet-lll.onrender.com/api/v1/comments/content/${contentId}`)
-      .then(response => response.json())
-      .then(data => {
-        const formattedData = data.map((comment: Comment) => ({
-          ...comment,
-          likeCount: comment.likeCount || 0,
-          dislikeCount: comment.dislikeCount || 0,
-          userReaction: comment.userReaction || null,
-          replies: comment.replies || []  // Inicializamos replies como array vacío
-        }));
-        setComments(formattedData);
-      });
-  }, [contentId]);
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(`https://proyecto-compunet-lll.onrender.com/api/v1/comments/content/${contentId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+  
+        const comments = response.data;
+  
+        // Solicita el conteo de likes y dislikes para cada comentario individualmente
+        const commentsWithReactions = await Promise.all(
+          comments.map(async (comment: Comment) => {
+            const reactionResponse = await axios.get(
+              `https://proyecto-compunet-lll.onrender.com/api/v1/reactions/count/${comment.id}`,
+              { headers: { "Authorization": `Bearer ${token}` } }
+            );
+            const { likes, dislikes } = reactionResponse.data;
+            return {
+              ...comment,
+              likeCount: likes,
+              dislikeCount: dislikes,
+              replies: comment.replies || [],  // Aseguramos que `replies` esté presente
+              userReaction: comment.userReaction || null,
+            };
+          })
+        );
+  
+        setComments(commentsWithReactions);
+      } catch (error) {
+        console.error("Error al cargar comentarios:", error);
+      }
+    };
+  
+    fetchComments();
+  }, [contentId, token]);
+  
+  
 
-  // Función para cargar respuestas de un comentario específico
-  const loadReplies = async (commentId: string) => {
-    try {
-      const response = await axios.get(`https://proyecto-compunet-lll.onrender.com/api/v1/comments/parent/${commentId}`);
-      const replies = response.data;
-
-      setComments(prevComments =>
-        prevComments.map(comment =>
-          comment.id === commentId
-            ? { ...comment, replies: replies }
-            : comment
-        )
-      );
-    } catch (error) {
-      console.error("Error al cargar respuestas:", error);
-    }
-  };
-
+  // Función para manejar el envío de un nuevo comentario
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
@@ -76,27 +83,23 @@ const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
     };
 
     try {
-      const response = await fetch("https://proyecto-compunet-lll.onrender.com/api/v1/comments", {
-        method: "POST",
+      const response = await axios.post("https://proyecto-compunet-lll.onrender.com/api/v1/comments", commentData, {
         headers: {
-          "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(commentData),
       });
 
-      if (response.ok) {
-        const createdComment: Comment = await response.json();
-        setComments((prevComments) => [{ ...createdComment, replies: [] }, ...prevComments]);
+      if (response.status === 201) {
+        const createdComment = response.data;
+        setComments(prev => [{ ...createdComment, replies: [], likeCount: 0, dislikeCount: 0 }, ...prev]);
         setNewComment("");
-      } else {
-        console.error("Error al agregar el comentario");
       }
     } catch (error) {
-      console.error("Error al enviar el comentario:", error);
+      console.error("Error al agregar el comentario:", error);
     }
   };
 
+  // Función para manejar el envío de una respuesta a un comentario
   const handleReplySubmit = async (commentId: string) => {
     if (!replyContent) return;
 
@@ -128,9 +131,75 @@ const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
     }
   };
 
+  // Función para manejar las reacciones de like y dislike
+  const handleReaction = async (commentId: string, type: 'like' | 'dislike') => {
+    const userId = localStorage.getItem("userId");
+    const reactionData = {
+      commentId,
+      userId,
+      type,
+    };
+
+    try {
+      const comment = comments.find(c => c.id === commentId);
+      const hasReacted = comment?.userReaction === type;
+
+      if (hasReacted) {
+        await axios.delete(`https://proyecto-compunet-lll.onrender.com/api/v1/reactions/${commentId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        }); 
+      } else {
+        await axios.post("https://proyecto-compunet-lll.onrender.com/api/v1/reactions", reactionData, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+      }
+
+      setComments(prev =>
+        prev.map(c =>
+          c.id === commentId
+            ? {
+                ...c,
+                userReaction: hasReacted ? null : type,
+                likeCount: hasReacted ? c.likeCount - 1 : type === 'like' ? c.likeCount + 1 : c.likeCount,
+                dislikeCount: hasReacted ? c.dislikeCount - 1 : type === 'dislike' ? c.dislikeCount + 1 : c.dislikeCount,
+              }
+            : c
+        )
+      );
+    } catch (error) {
+      console.error("Error al manejar la reacción:", error);
+    }
+  };
+
+  // Función para cargar las respuestas de un comentario específico
+  const loadReplies = async (commentId: string) => {
+    try {
+      const response = await axios.get(`https://proyecto-compunet-lll.onrender.com/api/v1/comments/parent/${commentId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const replies = response.data;
+
+      setComments(prevComments =>
+        prevComments.map(comment =>
+          comment.id === commentId
+            ? { ...comment, replies: replies }
+            : comment
+        )
+      );
+    } catch (error) {
+      console.error("Error al cargar respuestas:", error);
+    }
+  };
+
+  // Función para mostrar u ocultar respuestas
   const toggleReplies = (commentId: string) => {
     if (!showReplies[commentId]) {
-      // Si las respuestas no se han cargado, las cargamos
       loadReplies(commentId);
     }
     setShowReplies(prev => ({
@@ -182,13 +251,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
             </div>
             <p className="mt-3 text-gray-800">{comment.content}</p>
 
-            {/* Botones de reacción */}
+            {/* Botones de reacción con conteo */}
             <div className="flex items-center mt-2 space-x-4">
-              <button className="text-gray-600 flex items-center space-x-1">
+              <button
+                onClick={() => handleReaction(comment.id, 'like')}
+                className={`flex items-center space-x-1 ${comment.userReaction === 'like' ? 'text-blue-600' : 'text-gray-600'}`}
+              >
                 <AiOutlineLike size={20} />
                 <span>{comment.likeCount || 0}</span>
               </button>
-              <button className="text-gray-600 flex items-center space-x-1">
+              <button
+                onClick={() => handleReaction(comment.id, 'dislike')}
+                className={`flex items-center space-x-1 ${comment.userReaction === 'dislike' ? 'text-red-600' : 'text-gray-600'}`}
+              >
                 <AiOutlineDislike size={20} />
                 <span>{comment.dislikeCount || 0}</span>
               </button>
