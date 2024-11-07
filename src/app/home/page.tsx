@@ -110,6 +110,7 @@ const HomePage = () => {
                 id={content.id}
                 title={content.title}
                 type={content.type}
+                imageUrl={content.imageUrl}
               />
               
               {/* Edit and Delete buttons - Visible only for authorized user */}
