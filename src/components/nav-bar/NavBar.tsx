@@ -1,4 +1,3 @@
-// Navbar.tsx
 "use client";
 
 import Link from "next/link";
@@ -21,6 +20,8 @@ const Navbar = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("email");
+    localStorage.removeItem("roles");
     router.push("/login");
   };
 

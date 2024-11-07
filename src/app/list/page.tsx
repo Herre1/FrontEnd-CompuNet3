@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AiOutlineSearch } from "react-icons/ai";
 import { AiOutlineDelete } from "react-icons/ai";
 import Navbar from "@/components/nav-bar/NavBar";
+import { useAuth } from "../store/AuthContext";
 
 interface Content {
   id: string;
@@ -25,10 +26,13 @@ const UserLists: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const token = localStorage.getItem("token");
+  const { token } = useAuth();
+  
 
   useEffect(() => {
     const fetchUserLists = async () => {
+      console.log('token de useAuth ' + token)
+
       if (!token) {
         router.push("/login");
         return;
@@ -56,11 +60,11 @@ const UserLists: React.FC = () => {
 
     fetchUserLists();
   }, [token, router]);
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
-
+    
+  
     const filtered = lists.filter((list) =>
       list.status.toLowerCase().includes(term) ||
       list.id.toString().toLowerCase().includes(term) ||
@@ -69,8 +73,9 @@ const UserLists: React.FC = () => {
           content.title.toLowerCase().includes(term) ||
           content.description.toLowerCase().includes(term)
       )
+      
     );
-
+  
     setFilteredLists(filtered);
   };
 
@@ -102,7 +107,6 @@ const UserLists: React.FC = () => {
       <div className="w-1/5 bg-gray-900">
         <Navbar />
       </div>
-
       <div className="flex-1 p-6 bg-gray-100">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Tus Listas</h1>
@@ -126,13 +130,12 @@ const UserLists: React.FC = () => {
             />
           </div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredLists.length > 0 ? (
             filteredLists.map((list) => (
               <div
                 key={list.id}
-                className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow relative"
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow"
               >
                 <button
                   onClick={() => handleDelete(list.id)}
@@ -145,7 +148,6 @@ const UserLists: React.FC = () => {
                   Estado: {list.status}
                 </h2>
                 <p className="text-gray-600 mb-2">ID: {list.id}</p>
-
                 <ul className="space-y-4">
                   {list.contents && list.contents.length > 0 ? (
                     list.contents.map((content) => (
@@ -172,6 +174,6 @@ const UserLists: React.FC = () => {
       </div>
     </div>
   );
-};
+} 
 
 export default UserLists;

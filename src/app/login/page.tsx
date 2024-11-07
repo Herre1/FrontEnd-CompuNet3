@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
+import axios from "axios";
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 
@@ -19,6 +20,25 @@ const Login = () => {
   const [error, setError] = useState<string>('');
   const router = useRouter();
 
+  const getUser = async (user_id: any) => {
+    try {
+      const res = await axios.get(
+          `https://proyecto-compunet-lll.onrender.com/users/${user_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        
+        localStorage.setItem('roles', res.data.roles)
+    } catch (error) {
+      console.log(error)
+      setError("Error al crear contenido");
+    }
+  }
+
   const onSubmit = async (data: LoginData) => {
     try {
       setError('');
@@ -36,11 +56,14 @@ const Login = () => {
         throw new Error(result.message || 'Login failed');
       }
 
+      getUser(result.id)
+
       // Guardar el token y el userId en localStorage
       localStorage.setItem('token', result.token);
       // Después de `localStorage.setItem('token', result.token);`
       console.log("Token guardado:", localStorage.getItem('token'));
       localStorage.setItem('userId', result.id); // Guardar el ID del usuario
+      localStorage.setItem('email', data.email)
       localStorage.setItem('username', result.fullName); // Guardar el nombre del usuario
 
 
@@ -75,7 +98,7 @@ const Login = () => {
                   message: 'Invalid email address',
                 },
               })}
-              className={`mt-1 block w-full rounded-md border text-gray-800 ${
+              className={`mt-1 block w-full rounded-md border ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               } shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
@@ -98,7 +121,7 @@ const Login = () => {
                   message: 'Password must be at least 6 characters',
                 },
               })}
-              className={`mt-1 block w-full rounded-md border text-gray-800 ${
+              className={`mt-1 block w-full rounded-md border ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
               } shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
