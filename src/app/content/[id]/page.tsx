@@ -17,6 +17,8 @@ const ContentDetails = () => {
     useEffect(() => {
         // Verificar si el usuario actual es admin
         const userRole = localStorage.getItem("roles");
+        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaarrrozzz")
+        console.log(userRole)
         setIsAuthorizedUser(userRole === "admin");
 
         // Obtener detalles del contenido

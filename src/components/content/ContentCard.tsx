@@ -4,9 +4,10 @@ interface ContentCardProps {
     id: string;
     title: string;
     type: string;
+    imageUrl: string;
 }
 
-const ContentCard = ({ id, title, type }: ContentCardProps) => {
+const ContentCard = ({ id, title, type, imageUrl }: ContentCardProps) => {
     const router = useRouter();
 
     const handleClick = () => {
@@ -20,7 +21,7 @@ const ContentCard = ({ id, title, type }: ContentCardProps) => {
         >
             {/* Imagen en la parte superior */}
             <img 
-                src="https://via.placeholder.com/300x200" 
+                src={imageUrl} 
                 alt={`${title} cover`} 
                 className="w-full h-48 object-cover rounded-t-lg mb-4"
             />
