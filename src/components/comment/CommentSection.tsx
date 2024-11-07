@@ -298,7 +298,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                   placeholder="Escribe tu respuesta..."
-                  className="w-full mt-2 p-2 border border-gray-300 rounded-lg"
+                  className="w-full mt-2 p-2 border border-gray-700 text-black rounded-lg"
                 />
                 <button
                   onClick={() => handleReplySubmit(comment.id)}
