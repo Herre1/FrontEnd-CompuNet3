@@ -28,25 +28,25 @@ const HomePage = () => {
     fetchContents();
   }, []);
 
-  const handleSearch = (event) => {
+  const handleSearch = (event: { target: { value: string; }; }) => {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
     filterContent(term, selectedType, selectedGenre, selectedRating);
   };
 
-  const handleTypeChange = (event) => {
+  const handleTypeChange = (event: { target: { value: any; }; }) => {
     const type = event.target.value;
     setSelectedType(type);
     filterContent(searchTerm, type, selectedGenre, selectedRating);
   };
 
-  const handleGenreChange = (event) => {
+  const handleGenreChange = (event: { target: { value: any; }; }) => {
     const genre = event.target.value;
     setSelectedGenre(genre);
     filterContent(searchTerm, selectedType, genre, selectedRating);
   };
 
-  const handleRatingChange = (event) => {
+  const handleRatingChange = (event: { target: { value: any; }; }) => {
     const rating = event.target.value;
     setSelectedRating(rating);
     filterContent(searchTerm, selectedType, selectedGenre, rating);
@@ -56,10 +56,10 @@ const HomePage = () => {
     router.push('/home/add-content');
   };
 
-
+      
   
-      const filterContent = (term, type, genre, rating) => {
-      const filtered = contents.filter((content) => {
+  const filterContent = (term, type, genre, rating) => {
+    const filtered = contents.filter((content) => {
       const matchesTitle = content.title.toLowerCase().includes(term);
       const matchesType = type === "" || content.type === type;
       const matchesGenre = genre === "" || content.genre.includes(genre);
@@ -68,20 +68,18 @@ const HomePage = () => {
       const matchesDirector = content.director && content.director.toLowerCase().includes(term);
       const matchesStudio = content.studio && content.studio.toLowerCase().includes(term);
       const matchesProductionCompany = content.productionCompany && content.productionCompany.toLowerCase().includes(term);
-
+  
       return (
-        (matchesTitle ||
-          matchesActors ||
-          matchesDirector ||
-          matchesStudio ||
-          matchesProductionCompany) &&
+        (matchesTitle || matchesActors || matchesDirector || matchesStudio || matchesProductionCompany) &&
         matchesType &&
         matchesGenre &&
         matchesRating
       );
     });
-    setFilteredContents(filtered);
+  
+    setFilteredContents(Array.isArray(filtered) ? filtered : []);
   };
+  
 
   return (
     <div className="flex min-h-screen">
