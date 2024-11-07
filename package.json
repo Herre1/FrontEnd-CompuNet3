@@ -6,7 +6,9 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "install-cypress": "npm install cypress --save-dev",
+    "test:deploy": "npm run install-cypress && cypress run"
   },
   "dependencies": {
     "@primer/octicons-react": "^19.11.0",
