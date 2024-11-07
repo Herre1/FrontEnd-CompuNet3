@@ -6,13 +6,20 @@ import Navbar from "@/components/nav-bar/NavBar";
 import AddToListButton from "@/components/add-list/AddToListButton";
 import CommentSection from "@/components/comment/CommentSection";
 import { AiOutlineStar, AiOutlineEdit, AiOutlineDelete, AiOutlineArrowLeft } from "react-icons/ai";
+import axios from "axios";
 
 const ContentDetails = () => {
     const { id } = useParams();
     const router = useRouter();
     const [content, setContent] = useState(null);
+    const [isAuthorizedUser, setIsAuthorizedUser] = useState(false);
 
     useEffect(() => {
+        // Verificar si el usuario actual es admin
+        const userRole = localStorage.getItem("roles");
+        setIsAuthorizedUser(userRole === "admin");
+
+        // Obtener detalles del contenido
         const fetchContentDetails = async () => {
             const response = await fetch(`https://proyecto-compunet-lll.onrender.com/api/v1/content/${id}`);
             const data = await response.json();
@@ -21,21 +28,27 @@ const ContentDetails = () => {
         fetchContentDetails();
     }, [id]);
 
-    const handleDelete = () => {
-        fetch(`https://proyecto-compunet-lll.onrender.com/api/v1/content/${id}`, {
-            method: 'DELETE',
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Contenido eliminado correctamente.");
-                    router.push("/home");
-                }
+    const handleDelete = async () => {
+        if (!isAuthorizedUser) return;
+
+        try {
+            await axios.delete(`https://proyecto-compunet-lll.onrender.com/api/v1/content/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },
             });
+            alert("Contenido eliminado correctamente.");
+            router.push("/home");
+        } catch (error) {
+            console.error("Error al eliminar contenido:", error);
+        }
     };
 
     const handleModify = () => {
-        router.push(`/content/${id}/edit`);
+        if (isAuthorizedUser) {
+            router.push(`/home/edit-content/${id}`);
+        }
     };
 
     if (!content) return <p>Loading...</p>;
@@ -58,17 +71,21 @@ const ContentDetails = () => {
                         </button>
                         <div className="flex space-x-4">
                             <AddToListButton contentId={content.id} icon={<AiOutlineStar size={20} />} />
-                            <button onClick={handleModify} className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
-                                <AiOutlineEdit size={20} />
-                            </button>
-                            <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
-                                <AiOutlineDelete size={20} />
-                            </button>
+                            {isAuthorizedUser && (
+                                <>
+                                    <button onClick={handleModify} className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
+                                        <AiOutlineEdit size={20} />
+                                    </button>
+                                    <button onClick={handleDelete} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                                        <AiOutlineDelete size={20} />
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
 
                     {/* Imagen por defecto */}
-                    <img src="https://via.placeholder.com/600x400" alt={content.title} className="w-full h-64 object-cover mb-4 rounded-lg" />
+                    <img src={content.imageUrl || "https://via.placeholder.com/600x400"} alt={content.title} className="w-full h-64 object-cover mb-4 rounded-lg" />
 
                     {/* Detalles del contenido */}
                     <h1 className="text-3xl font-bold mb-2 text-gray-800">{content.title}</h1>
