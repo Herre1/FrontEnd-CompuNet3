@@ -1,10 +1,9 @@
-// CommentSection.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import { AiOutlineLike, AiOutlineDislike } from 'react-icons/ai';
 import ShowRepliesButton from '../replies/ShowRepliesButton';
-import { useAuth } from "../../app/store/AuthContext"; // Import actualizado
+import { useAuth } from "../../app/store/AuthContext";
 
 interface Comment {
   id: string;
@@ -19,15 +18,20 @@ interface Comment {
   createdAt: string;
 }
 
-const CommentSection = ({ contentId }) => {
+interface CommentSectionProps {
+  contentId: string;
+}
+
+const CommentSection: React.FC<CommentSectionProps> = ({ contentId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState<string>("");
   const { token } = useAuth();
 
   useEffect(() => {
     fetch(`https://proyecto-compunet-lll.onrender.com/api/v1/comments/content/${contentId}`)
       .then(response => response.json())
       .then(data => {
-        const formattedData = data.map(comment => ({
+        const formattedData = data.map((comment: Comment) => ({
           ...comment,
           likeCount: 0, // Inicializamos en 0, ya que el backend no lo proporciona
           dislikeCount: 0,
@@ -37,11 +41,43 @@ const CommentSection = ({ contentId }) => {
       });
   }, [contentId]);
 
-  const getInitial = (fullName: string) => {
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return; // Evitar comentarios vacíos
+
+    const userId = localStorage.getItem("userId");
+    const commentData = {
+      userId,
+      contentId,
+      content: newComment,
+    };
+
+    try {
+      const response = await fetch("https://proyecto-compunet-lll.onrender.com/api/v1/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(commentData),
+      });
+
+      if (response.ok) {
+        const createdComment: Comment = await response.json();
+        setComments((prevComments) => [createdComment, ...prevComments]);
+        setNewComment(""); // Limpiar el campo de texto
+      } else {
+        console.error("Error al agregar el comentario");
+      }
+    } catch (error) {
+      console.error("Error al enviar el comentario:", error);
+    }
+  };
+
+  const getInitial = (fullName: string): string => {
     return fullName ? fullName.charAt(0).toUpperCase() : "?";
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string): string => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -70,15 +106,15 @@ const CommentSection = ({ contentId }) => {
           }
         });
         setComments(prevComments =>
-          prevComments.map(comment =>
-            comment.id === commentId
+          prevComments.map(c =>
+            c.id === commentId
               ? {
-                  ...comment,
+                  ...c,
                   userReaction: null,
-                  likeCount: type === 'like' ? comment.likeCount - 1 : comment.likeCount,
-                  dislikeCount: type === 'dislike' ? comment.dislikeCount - 1 : comment.dislikeCount,
+                  likeCount: type === 'like' ? c.likeCount - 1 : c.likeCount,
+                  dislikeCount: type === 'dislike' ? c.dislikeCount - 1 : c.dislikeCount,
                 }
-              : comment
+              : c
           )
         );
       } else {
@@ -99,15 +135,15 @@ const CommentSection = ({ contentId }) => {
         if (response.ok) {
           const reaction = await response.json();
           setComments(prevComments =>
-            prevComments.map(comment =>
-              comment.id === commentId
+            prevComments.map(c =>
+              c.id === commentId
                 ? {
-                    ...comment,
+                    ...c,
                     userReaction: type,
-                    likeCount: type === 'like' ? comment.likeCount + 1 : comment.likeCount,
-                    dislikeCount: type === 'dislike' ? comment.dislikeCount + 1 : comment.dislikeCount,
+                    likeCount: type === 'like' ? c.likeCount + 1 : c.likeCount,
+                    dislikeCount: type === 'dislike' ? c.dislikeCount + 1 : c.dislikeCount,
                   }
-                : comment
+                : c
             )
           );
         }
@@ -120,9 +156,27 @@ const CommentSection = ({ contentId }) => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Comentarios</h2>
-      <div className="space-y-4">
+
+      {/* Formulario para agregar un nuevo comentario */}
+      <div className="mt-4 bg-white p-4 rounded-lg shadow-md">
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          className="w-full p-2 border border-gray-700 rounded-lg text-gray-800"
+          placeholder="Escribe tu comentario..."
+        />
+        <button
+          onClick={handleAddComment}
+          className="mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg"
+        >
+          Agregar Comentario
+        </button>
+      </div>
+
+      <div className="space-y-4 mt-4">
         {comments.map(comment => (
           <div key={comment.id} className="bg-white p-4 rounded-lg shadow-md">
+            {/* Renderizado del comentario */}
             <div className="flex items-start justify-between border-b pb-2">
               <div className="flex items-center space-x-2">
                 <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
