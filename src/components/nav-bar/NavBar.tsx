@@ -29,7 +29,7 @@ const Navbar = () => {
     <div className="flex flex-col h-full p-4 bg-gray-800 text-white">
       <div className="flex flex-col items-center mb-6">
         <img src="/logo.png" alt="Logo" className="w-16 h-16 mb-4" />
-        <span className="text-lg font-semibold">Bienvenido, {username}</span>
+        <span className="text-lg font-semibold">Bienvenido, Usuario</span>
       </div>
 
             <div className="flex-1 space-y-4 w-full">
