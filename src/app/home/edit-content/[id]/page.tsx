@@ -1,13 +1,12 @@
-'use client'
+"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/store/AuthContext";
+import { useRouter, useParams } from "next/navigation";
 import Navbar from "@/components/nav-bar/NavBar";
 import { uploadImageToCloudinary } from "@/utils/cloudinary";
 
-const AddContentPage: React.FC = () => {
+const EditContentPage: React.FC = () => {
   const [contentData, setContentData] = useState({
     title: "",
     genre: [""],
@@ -21,17 +20,29 @@ const AddContentPage: React.FC = () => {
     studio: "",
     productionCompany: "",
     rating: 0,
-    image: null, // Nuevo campo para la imagen
+    imageUrl: "", // Campo para la URL de la imagen actual
   });
-
+  const [imageFile, setImageFile] = useState<File | null>(null); // Nuevo estado para la imagen
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { token } = useAuth();
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await axios.get(`https://proyecto-compunet-lll.onrender.com/api/v1/content/${id}`);
+        setContentData(response.data);
+      } catch (error) {
+        console.log("Error fetching content:", error);
+      }
+    };
+    fetchContent();
+  }, [id]);
 
   const handleChange = (e: any) => {
     const { name, value, files } = e.target;
     if (name === "image") {
-      setContentData((prevData) => ({ ...prevData, image: files[0] }));
+      setImageFile(files[0]);
     } else {
       setContentData((prevData) => ({ ...prevData, [name]: value }));
     }
@@ -54,6 +65,7 @@ const AddContentPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
 
     if (!token) {
       router.push("/login");
@@ -61,40 +73,31 @@ const AddContentPage: React.FC = () => {
     }
 
     try {
-      let imageUrl = null;
-      if (contentData.image) {
-        // Subir la imagen a Cloudinary y obtener la URL
-        const uploadResponse = await uploadImageToCloudinary(contentData.image);
-        console.log('respuesta de subir imagen: ' + uploadResponse)
+      let imageUrl = contentData.imageUrl;
+      if (imageFile) {
+        const uploadResponse = await uploadImageToCloudinary(imageFile);
         imageUrl = uploadResponse.secure_url;
       }
 
-      const { image, ...restContentData } = contentData;
-
+      const { id, ...restContentData } = contentData;
       const formattedData = {
         ...restContentData,
         genre: contentData.genre.filter((g) => g.trim() !== ""),
         actors: contentData.actors.filter((a) => a.trim() !== ""),
         rating: Number(contentData.rating),
-        imageUrl: imageUrl, // Agregar la URL de la imagen al objeto formattedData
+        imageUrl, // Agregar la URL de la imagen
       };
 
-      console.log(formattedData)
-
-      await axios.post(
-        "https://proyecto-compunet-lll.onrender.com/api/v1/content",
-        formattedData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.patch(`https://proyecto-compunet-lll.onrender.com/api/v1/content/${id}`, formattedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       router.push("/home");
     } catch (error) {
-      console.log(error);
-      setError("Error al crear contenido");
+      console.log("Error updating content:", error);
+      setError("Error al actualizar contenido");
     }
   };
 
@@ -104,9 +107,10 @@ const AddContentPage: React.FC = () => {
         <Navbar />
       </div>
       <div className="flex-1 p-6 bg-gray-100">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Añadir Contenido</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Editar Contenido</h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-md shadow-md space-y-4">
+          {/* Título */}
           <div>
             <label className="block text-gray-700">Título</label>
             <input
@@ -117,6 +121,8 @@ const AddContentPage: React.FC = () => {
               className="w-full px-3 py-2 border text-gray-600 rounded-md"
             />
           </div>
+
+          {/* Género */}
           <div>
             <label className="block text-gray-700">Género</label>
             {contentData.genre.map((genre, index) => (
@@ -136,6 +142,8 @@ const AddContentPage: React.FC = () => {
               + Añadir género
             </button>
           </div>
+
+          {/* Año */}
           <div>
             <label className="block text-gray-700">Año</label>
             <input
@@ -146,6 +154,8 @@ const AddContentPage: React.FC = () => {
               className="w-full px-3 text-gray-600 py-2 border rounded-md"
             />
           </div>
+
+          {/* Actores */}
           <div>
             <label className="block text-gray-700">Actores</label>
             {contentData.actors.map((actor, index) => (
@@ -165,6 +175,8 @@ const AddContentPage: React.FC = () => {
               + Añadir actor
             </button>
           </div>
+
+          {/* Descripción */}
           <div>
             <label className="block text-gray-700">Descripción</label>
             <textarea
@@ -174,6 +186,8 @@ const AddContentPage: React.FC = () => {
               className="w-full px-3 py-2 text-gray-600 border rounded-md"
             />
           </div>
+
+          {/* Tipo */}
           <div>
             <label className="block text-gray-700">Tipo</label>
             <select
@@ -187,6 +201,8 @@ const AddContentPage: React.FC = () => {
               <option value="anime">Anime</option>
             </select>
           </div>
+
+          {/* Director */}
           <div>
             <label className="block text-gray-700">Director</label>
             <input
@@ -197,6 +213,8 @@ const AddContentPage: React.FC = () => {
               className="w-full px-3 text-gray-600 py-2 border rounded-md"
             />
           </div>
+
+          {/* Campos Condicionales */}
           {contentData.type === "series" && (
             <>
               <div>
@@ -221,6 +239,7 @@ const AddContentPage: React.FC = () => {
               </div>
             </>
           )}
+
           {contentData.type === "anime" && (
             <div>
               <label className="block text-gray-700">Estudio</label>
@@ -233,6 +252,8 @@ const AddContentPage: React.FC = () => {
               />
             </div>
           )}
+
+          {/* Imagen */}
           <div>
             <label className="block text-gray-700">Imagen</label>
             <input
@@ -242,6 +263,8 @@ const AddContentPage: React.FC = () => {
               className="w-full text-gray-600 px-3 py-2 border rounded-md mb-2"
             />
           </div>
+
+          {/* Rating */}
           <div>
             <label className="block text-gray-700">Rating</label>
             <input
@@ -250,15 +273,12 @@ const AddContentPage: React.FC = () => {
               value={contentData.rating}
               onChange={handleChange}
               className="w-full px-3 py-2 text-gray-600 border rounded-md"
-              min="0"
-              max="10"
+              step="0.1"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 rounded-md hover:bg-blue-600 text-white py-2 rounded-md"
-          >
-            Crear Contenido
+
+          <button type="submit" className="w-full bg-blue-500 rounded-md hover:bg-blue-600 text-white py-2">
+            Guardar Cambios
           </button>
         </form>
       </div>
@@ -266,4 +286,4 @@ const AddContentPage: React.FC = () => {
   );
 };
 
-export default AddContentPage;
+export default EditContentPage;

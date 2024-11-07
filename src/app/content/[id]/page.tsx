@@ -68,7 +68,7 @@ const ContentDetails = () => {
                     </div>
 
                     {/* Imagen por defecto */}
-                    <img src="https://via.placeholder.com/600x400" alt={content.title} className="w-full h-64 object-cover mb-4 rounded-lg" />
+                    <img src={content.imageUrl} alt={content.title} className="w-full h-64 object-cover mb-4 rounded-lg" />
 
                     {/* Detalles del contenido */}
                     <h1 className="text-3xl font-bold mb-2 text-gray-800">{content.title}</h1>
