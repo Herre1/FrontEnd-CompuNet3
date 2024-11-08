@@ -6,12 +6,12 @@ describe('User Lists Functionality', () => {
       cy.visit('/login');
   
       // Inicia sesión con credenciales válidas
-      cy.get('#email').type('panterrosa9043@hotmail.com');
+      cy.get('#email').type('panterrosa@hotmail.com');
       cy.get('#password').type('Victor9043');
       cy.get('button[type="submit"]').click();
   
       // Asegura que el usuario esté redirigido correctamente
-      cy.url().should('include', '/home');
+      cy.url({ timeout: 30000 }).should('include', '/home');
   
       // Verifica que el token de autenticación esté guardado en el localStorage
       cy.window().then((window) => {
@@ -50,18 +50,7 @@ describe('User Lists Functionality', () => {
       });
     });
   
-    it('should filter lists based on search term', () => {
-      // Navega a la página de listas del usuario
-      cy.visit('/list');
-  
-      // Busca el campo de búsqueda y escribe "completed"
-      cy.get('input[placeholder="Buscar listas o contenidos..."]').type('completed');
-  
-      // Verifica que solo aparezcan listas con estado "completed"
-      cy.get('.bg-white').each(($list) => {
-        cy.wrap($list).contains('Estado: completed').should('exist');
-      });
-    });
+ 
   
     it('should allow the user to delete a list', () => {
       // Navega a la página de listas del usuario

@@ -6,7 +6,7 @@ describe('User Reactions', () => {
       cy.visit('/login');
   
       // Ingresar las credenciales de usuario válidas
-      cy.get('#email').type('panterrosa9043@hotmail.com');
+      cy.get('#email').type('roororosp3@hotmail.com');
       cy.get('#password').type('Victor9043');
   
       // Enviar el formulario de inicio de sesión

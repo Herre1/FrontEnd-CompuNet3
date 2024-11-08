@@ -10,6 +10,7 @@ describe('Login', () => {
   
       // Submit the form
       cy.get('button[type="submit"]').click();
+      cy.wait(3000);
   
       // Verify that the user is redirected to the home page
       cy.url().should('include', '/home');

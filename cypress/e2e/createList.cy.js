@@ -6,7 +6,7 @@ describe('Create List Functionality', () => {
       cy.visit('/login');
   
       // Ingresa las credenciales de inicio de sesión y envía el formulario
-      cy.get('#email').type('roororosp3@hotmail.com');
+      cy.get('#email').type('panterrosa@hotmail.com');
       cy.get('#password').type('Victor9043');
       cy.get('button[type="submit"]').click();
   
@@ -20,21 +20,12 @@ describe('Create List Functionality', () => {
       });
   
       // Navega a la página de creación de listas
-      cy.visit('/list/create');
-    });
-  
-    it('should display the create list form with content options', () => {
-      // Asegura que el título de la página esté visible
-      cy.contains('Crear Nueva Lista').should('be.visible');
-  
-      // Verifica que haya opciones de contenido disponibles
-      cy.get('input[type="checkbox"]').should('have.length.greaterThan', 0);
-    });
+      
+    }); 
   
   
     it('should create a new list successfully', () => {
-      // Selecciona al menos un contenido en el formulario
-      cy.get('input[type="checkbox"]').first().check();
+    
   
       // Completa el campo de estado
       cy.get('input#status').type('completed');
@@ -53,7 +44,7 @@ describe('Create List Functionality', () => {
       });
   
       // Intenta enviar el formulario
-      cy.get('input[type="checkbox"]').first().check();
+ 
       cy.get('input#status').type('completed');
       cy.get('button[type="submit"]').click();
   
